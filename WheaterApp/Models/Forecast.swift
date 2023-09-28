@@ -12,7 +12,7 @@ struct Forecast {
     var temp = ""
     var pressure = ""
     var humidity = ""
-    var visibility = "1000 miles"
+    var visibility = ""
     var windSpeed = ""
     var date = ""
     var image = ""
@@ -40,8 +40,11 @@ struct Forecast {
             }
         }
         
-        if let visibilityValue = json["visibility"].string {
-            visibility = visibilityValue + " miles"
+        if let visibilityValue = json["visibility"].int {
+            visibility = String(
+                format: "%.1f",
+                Double(visibilityValue) * 0.000621371
+            ) + " miles"
         }
         
         if let wind = json["wind"].dictionary {

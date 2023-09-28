@@ -257,7 +257,7 @@ class MainViewController: UIViewController {
     
     let temperatureLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont(name: "Montserrat-Light", size: 80)
+        label.font = UIFont(name: "Montserrat-Light", size: 70)
         label.text = "°C"
         label.textColor = .black
         label.textAlignment = .center
@@ -271,7 +271,6 @@ class MainViewController: UIViewController {
         configureUI()
         collectionView.delegate = self
         collectionView.dataSource = self
-        
         loadData()
     }
 }
@@ -310,7 +309,7 @@ extension MainViewController {
         
         weatherImageView.snp.makeConstraints { make in
             make.centerX.equalTo(circleView.snp.centerX)
-            make.top.equalTo(-10)
+            make.top.equalTo(-5)
             make.height.width.equalTo(120)
         }
         temperatureLabel.snp.makeConstraints { make in
@@ -434,15 +433,54 @@ extension MainViewController {
     
     func setResults() {
         if let firstWeather = weatherArray.first, let firstForecast = firstWeather.forecastArray.first {
-            dateLabel.text = firstForecast.date
             temperatureLabel.text = firstForecast.temp + "°C"
             weatherImageView.sd_setImage(with: URL(string:  "https://openweathermap.org/img/wn/\(firstForecast.image)@2x.png"))
             windLabelResult.text = firstForecast.windSpeed
             humidityLabelResult.text = firstForecast.humidity
             visibilityLabelResult.text = firstForecast.visibility
             airLabelResult.text = firstForecast.pressure
+            
+            var date = firstForecast.date
+            if !date.isEmpty {
+                if let indexOfSpace = date.firstIndex(of: " ") {
+                    date = String(date.prefix(upTo: indexOfSpace))
+                }
+                date = date.trimmingCharacters(in: .whitespaces)
+                dateLabel.text = setFormattedDate(date: date)
+            }
+
         }
         cityLabel.text = weatherArray.first?.cityName
         countryLabel.text = weatherArray.first?.countryName
+    }
+    
+    func setFormattedDate(date: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        if let date = dateFormatter.date(from: date) {
+            let calendar = Calendar.current
+            let day = calendar.component(.day, from: date)
+            let monthNumber = calendar.component(.month, from: date)
+            var month = ""
+            switch monthNumber {
+            case 1: month = "January"
+            case 2: month = "February"
+            case 3: month = "March"
+            case 4: month = "April"
+            case 5: month = "May"
+            case 6: month = "June"
+            case 7: month = "July"
+            case 8: month = "August"
+            case 9: month = "September"
+            case 10: month = "October"
+            case 11: month = "November"
+            default: month = "December"
+            }
+            let year = calendar.component(.year, from: date)
+            let dayCurrent = "Today, \(month) \(day)th, \(year)"
+            return dayCurrent
+        } else {
+            return "Invalid date format"
+        }
     }
 }
