@@ -10,16 +10,15 @@ import SnapKit
 import SwiftyJSON
 import Alamofire
 import SVProgressHUD
+import SDWebImage
 
 class MainViewController: UIViewController {
     private static let id = "&appid=82aa1dd27f2bfb3f068c8bdd58442661"
-    var weatherArray: [Forecast] = [
-        Forecast(cityName: "qwe", temp: "10° C", pressure: "123", humadity: "123", visibility: "123", windSpeed: "123", date: "Sunday", image: "10d"),
-        Forecast(cityName: "qwe", temp: "10° C", pressure: "123", humadity: "123", visibility: "123", windSpeed: "123", date: "Sunday", image: "10d"),
-        Forecast(cityName: "qwe", temp: "10° C", pressure: "123", humadity: "123", visibility: "123", windSpeed: "123", date: "Sunday", image: "10d"),
-        Forecast(cityName: "qwe", temp: "10° C", pressure: "123", humadity: "123", visibility: "123", windSpeed: "123", date: "Sunday", image: "10d"),
-        Forecast(cityName: "qwe", temp: "10° C", pressure: "123", humadity: "123", visibility: "123", windSpeed: "123", date: "Sunday", image: "10d"),
-    ]
+    
+    var fiveForecast: [String] = []
+    
+    var weatherArray: [Weather] = []
+    
     //MARK: Elements
     let backgroundView: GradientView = {
         let view = GradientView()
@@ -258,8 +257,8 @@ class MainViewController: UIViewController {
     
     let temperatureLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont(name: "Montserrat-Light", size: 100)
-        label.text = "10°C"
+        label.font = UIFont(name: "Montserrat-Light", size: 80)
+        label.text = "°C"
         label.textColor = .black
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -272,6 +271,8 @@ class MainViewController: UIViewController {
         configureUI()
         collectionView.delegate = self
         collectionView.dataSource = self
+        
+        loadData()
     }
 }
 //MARK: Constraints
@@ -379,14 +380,26 @@ extension MainViewController {
 
 extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        weatherArray.count
+        5
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: ForecastCollectionViewCell.identifier,
             for: indexPath) as! ForecastCollectionViewCell
-        cell.configure(forecast: weatherArray[indexPath.row])
+        var filteredForecasts: [Forecast] = []
+        
+        for weather in weatherArray {
+            let midnightForecasts = weather.forecastArray.filter { $0.date.hasSuffix("00:00:00") }
+            filteredForecasts.append(contentsOf: midnightForecasts)
+        }
+        
+        print(filteredForecasts)
+        
+        if indexPath.row < filteredForecasts.count {
+            let forecast = filteredForecasts[indexPath.row]
+            cell.configure(forecast: forecast)
+        }
         
         return cell
     }
@@ -406,12 +419,30 @@ extension MainViewController {
         AF.request("http://api.openweathermap.org/data/2.5/forecast?q=Almaty" + MainViewController.id, method: .get).responseJSON { response in
             
             SVProgressHUD.dismiss()
-                        
+            
             if response.response?.statusCode == 200 {
-                let json = JSON(response.value!)
-                print(json)
-                
+                let json = JSON(response.data!)
+                let weather = Weather(json: json)
+                self.weatherArray.append(weather)
+                self.setResults()
+                self.collectionView.reloadData()
+            } else {
+                SVProgressHUD.showError(withStatus: "CONNECTION_ERROR")
             }
         }
+    }
+    
+    func setResults() {
+        if let firstWeather = weatherArray.first, let firstForecast = firstWeather.forecastArray.first {
+            dateLabel.text = firstForecast.date
+            temperatureLabel.text = firstForecast.temp + "°C"
+            weatherImageView.sd_setImage(with: URL(string:  "https://openweathermap.org/img/wn/\(firstForecast.image)@2x.png"))
+            windLabelResult.text = firstForecast.windSpeed
+            humidityLabelResult.text = firstForecast.humidity
+            visibilityLabelResult.text = firstForecast.visibility
+            airLabelResult.text = firstForecast.pressure
+        }
+        cityLabel.text = weatherArray.first?.cityName
+        countryLabel.text = weatherArray.first?.countryName
     }
 }

@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import SDWebImage
 
 class ForecastCollectionViewCell: UICollectionViewCell {
     static let identifier = "ForecastCollectionViewCell"
@@ -54,12 +55,33 @@ class ForecastCollectionViewCell: UICollectionViewCell {
     }()
     
     func configure(forecast: Forecast) {
-        weekLabel.text = forecast.date
-        weatherImageView.image = UIImage(named: forecast.image)
-        temperatureLabel.text = forecast.temp
+        weatherImageView.sd_setImage(with: URL(string:  "https://openweathermap.org/img/wn/\(forecast.image).png"))
+        
+        var date = forecast.date
+        if !date.isEmpty {
+            if let indexOfSpace = date.firstIndex(of: " ") {
+                date = String(date.prefix(upTo: indexOfSpace))
+            }
+            date = date.trimmingCharacters(in: .whitespaces)
+            weekLabel.text = setDateFormat(date: date)
+        }
+        temperatureLabel.text = forecast.temp + " °C"
         setupUI()
     }
     
+    func setDateFormat(date: String)  -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        if let date = dateFormatter.date(from: date) {
+            let calendar = Calendar.current
+            let dayOfWeek = calendar.component(.weekday, from: date)
+            let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+            let dayName = weekdays[dayOfWeek - 1]
+            return dayName
+        } else {
+            return "Invalid date format"
+        }
+    }
     
     func setupUI() {
         addSubview(weekLabel)
@@ -81,7 +103,6 @@ class ForecastCollectionViewCell: UICollectionViewCell {
         borderView.snp.makeConstraints { make in
             make.top.equalTo(weekLabel.snp.bottom).offset(6)
             make.left.right.bottom.equalToSuperview()
-//            make.width.equalTo(70)
             make.height.equalTo(75)
         }
         
