@@ -7,10 +7,19 @@
 
 import UIKit
 import SnapKit
+import SwiftyJSON
+import Alamofire
+import SVProgressHUD
 
 class MainViewController: UIViewController {
     private static let id = "&appid=82aa1dd27f2bfb3f068c8bdd58442661"
-    var weatherArray: [Forecast] = [Forecast(cityName: "qwe", temp: "12", pressure: "123", humadity: "123", visibility: "123", windSpeed: "123", date: "123", image: "")]
+    var weatherArray: [Forecast] = [
+        Forecast(cityName: "qwe", temp: "10° C", pressure: "123", humadity: "123", visibility: "123", windSpeed: "123", date: "Sunday", image: "10d"),
+        Forecast(cityName: "qwe", temp: "10° C", pressure: "123", humadity: "123", visibility: "123", windSpeed: "123", date: "Sunday", image: "10d"),
+        Forecast(cityName: "qwe", temp: "10° C", pressure: "123", humadity: "123", visibility: "123", windSpeed: "123", date: "Sunday", image: "10d"),
+        Forecast(cityName: "qwe", temp: "10° C", pressure: "123", humadity: "123", visibility: "123", windSpeed: "123", date: "Sunday", image: "10d"),
+        Forecast(cityName: "qwe", temp: "10° C", pressure: "123", humadity: "123", visibility: "123", windSpeed: "123", date: "Sunday", image: "10d"),
+    ]
     //MARK: Elements
     let backgroundView: GradientView = {
         let view = GradientView()
@@ -224,6 +233,8 @@ class MainViewController: UIViewController {
     var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
+        layout.minimumInteritemSpacing = 5
+        layout.itemSize = CGSize(width: 70, height: 93)
         
         let collectionView = UICollectionView(
             frame: .zero,
@@ -233,9 +244,26 @@ class MainViewController: UIViewController {
             ForecastCollectionViewCell.self,
             forCellWithReuseIdentifier: ForecastCollectionViewCell.identifier
         )
-        collectionView.backgroundColor = .white
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
+    }()
+    
+    let weatherImageView: UIImageView = {
+        let image = UIImageView()
+        image.contentMode = .scaleAspectFill
+        image.image = UIImage(named: "10d")
+        image.translatesAutoresizingMaskIntoConstraints = false
+        return image
+    }()
+    
+    let temperatureLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont(name: "Montserrat-Light", size: 100)
+        label.text = "10°C"
+        label.textColor = .black
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
     override func viewDidLoad() {
@@ -254,7 +282,10 @@ extension MainViewController {
         view.addSubview(dateLabel)
         view.addSubview(cityLabel)
         view.addSubview(countryLabel)
+        
         view.addSubview(circleView)
+        circleView.addSubview(weatherImageView)
+        circleView.addSubview(temperatureLabel)
         
         view.addSubview(stackVerticalLabel)
         stackVerticalLabel.addArrangedSubview(windLabel)
@@ -276,49 +307,52 @@ extension MainViewController {
         collectionBGView.addSubview(collectionTitleLabel)
         collectionBGView.addSubview(collectionView)
         
-        collectionView.snp.makeConstraints { make in
-            make.top.equalTo(collectionTitleLabel.snp.top).offset(16)
-            make.right.left.equalToSuperview().offset(15)
+        weatherImageView.snp.makeConstraints { make in
+            make.centerX.equalTo(circleView.snp.centerX)
+            make.top.equalTo(-10)
+            make.height.width.equalTo(120)
         }
-        
+        temperatureLabel.snp.makeConstraints { make in
+            make.centerX.equalTo(circleView.snp.centerX)
+            make.bottom.equalTo(circleView.snp.bottom).offset(-49)
+        }
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(collectionTitleLabel.snp.bottom).offset(16)
+            make.right.equalToSuperview().offset(-15)
+            make.left.equalToSuperview().offset(15)
+            make.height.equalTo(93)
+        }
         collectionTitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(25)
+            make.top.equalTo(35)
             make.left.equalTo(15)
         }
-        
         collectionBGView.snp.makeConstraints { make in
             make.bottom.right.left.equalToSuperview()
             make.top.equalTo(humidityLabelResult.snp.bottom).offset(30)
         }
-        
         stackVerticalLabel4.snp.makeConstraints { make in
             make.top.equalTo(stackVerticalLabel3.snp.bottom).offset(20)
             make.right.equalTo(-57)
             make.width.equalTo(90)
         }
-        
         stackVerticalLabel3.snp.makeConstraints { make in
             make.top.equalTo(circleView.snp.bottom).offset(31)
             make.right.equalTo(-57)
             make.width.equalTo(90)
         }
-        
         stackVerticalLabel2.snp.makeConstraints { make in
             make.top.equalTo(stackVerticalLabel.snp.bottom).offset(20)
             make.left.equalTo(57)
             make.width.equalTo(90)
         }
-        
         stackVerticalLabel.snp.makeConstraints { make in
             make.top.equalTo(circleView.snp.bottom).offset(31)
             make.left.equalTo(57)
             make.width.equalTo(90)
         }
-        
         backgroundView.snp.makeConstraints { make in
             make.bottom.top.right.left.equalToSuperview()
         }
-        
         searchButton.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.right.equalTo(-25)
@@ -343,9 +377,9 @@ extension MainViewController {
     }
 }
 
-extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        5
+        weatherArray.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -357,5 +391,27 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
         return cell
     }
     
-    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let collectionViewWidth = collectionView.bounds.width
+        let totalSpacing = 4 * 10
+        let itemWidth = (collectionViewWidth - CGFloat(totalSpacing)) / 5
+        return CGSize(width: itemWidth, height: 93)
+    }
+}
+
+extension MainViewController {
+    func loadData() {
+        SVProgressHUD.show()
+        
+        AF.request("http://api.openweathermap.org/data/2.5/forecast?q=Almaty" + MainViewController.id, method: .get).responseJSON { response in
+            
+            SVProgressHUD.dismiss()
+                        
+            if response.response?.statusCode == 200 {
+                let json = JSON(response.value!)
+                print(json)
+                
+            }
+        }
+    }
 }

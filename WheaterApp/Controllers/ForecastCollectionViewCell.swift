@@ -38,6 +38,7 @@ class ForecastCollectionViewCell: UICollectionViewCell {
     
     let weatherImageView: UIImageView = {
        let image = UIImageView()
+        image.contentMode = .scaleToFill
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
     }()
@@ -68,24 +69,25 @@ class ForecastCollectionViewCell: UICollectionViewCell {
         
         temperatureLabel.snp.makeConstraints { make in
             make.centerX.equalTo(borderView.snp.centerX)
-            make.top.equalTo(weatherImageView.snp.bottom).offset(6)
+            make.bottom.equalToSuperview().offset(-15)
         }
         
         weatherImageView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(13)
+            make.top.equalToSuperview()
             make.centerX.equalTo(borderView.snp.centerX)
-            make.height.width.equalTo(26)
+            make.height.width.equalTo(50)
         }
         
         borderView.snp.makeConstraints { make in
             make.top.equalTo(weekLabel.snp.bottom).offset(6)
             make.left.right.bottom.equalToSuperview()
-            make.width.equalTo(70)
+//            make.width.equalTo(70)
             make.height.equalTo(75)
         }
         
         weekLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
+            make.centerX.equalTo(snp.centerX)
         }
     }
 }

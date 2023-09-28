@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftyJSON
 
 struct Forecast {
     var cityName = ""
@@ -26,5 +27,11 @@ struct Forecast {
         self.windSpeed = windSpeed
         self.date = date
         self.image = image
+    }
+    
+    init(json: JSON) {
+        if let temp = json[""].string {
+            
+        }
     }
 }
