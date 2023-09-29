@@ -10,6 +10,7 @@
 		6F12ED382AC566FB003D167A /* ForecastCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F12ED372AC566FA003D167A /* ForecastCollectionViewCell.swift */; };
 		6F12ED3B2AC56A12003D167A /* Forecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F12ED3A2AC56A12003D167A /* Forecast.swift */; };
 		6F12ED3D2AC56A6D003D167A /* Urls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F12ED3C2AC56A6D003D167A /* Urls.swift */; };
+		6F12ED3F2AC6027F003D167A /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F12ED3E2AC6027F003D167A /* SearchViewController.swift */; };
 		6F942BEE2AC0493D001AEFA9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F942BED2AC0493D001AEFA9 /* AppDelegate.swift */; };
 		6F942BF02AC0493D001AEFA9 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F942BEF2AC0493D001AEFA9 /* SceneDelegate.swift */; };
 		6F942BF72AC0493E001AEFA9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F942BF62AC0493E001AEFA9 /* Assets.xcassets */; };
@@ -28,6 +29,7 @@
 		6F12ED372AC566FA003D167A /* ForecastCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastCollectionViewCell.swift; sourceTree = "<group>"; };
 		6F12ED3A2AC56A12003D167A /* Forecast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Forecast.swift; sourceTree = "<group>"; };
 		6F12ED3C2AC56A6D003D167A /* Urls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Urls.swift; sourceTree = "<group>"; };
+		6F12ED3E2AC6027F003D167A /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		6F942BEA2AC0493D001AEFA9 /* WheaterApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WheaterApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F942BED2AC0493D001AEFA9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6F942BEF2AC0493D001AEFA9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 			children = (
 				6F942C042AC04A43001AEFA9 /* MainViewController.swift */,
 				6F12ED372AC566FA003D167A /* ForecastCollectionViewCell.swift */,
+				6F12ED3E2AC6027F003D167A /* SearchViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -272,6 +275,7 @@
 			files = (
 				6F942C052AC04A43001AEFA9 /* MainViewController.swift in Sources */,
 				6F942BEE2AC0493D001AEFA9 /* AppDelegate.swift in Sources */,
+				6F12ED3F2AC6027F003D167A /* SearchViewController.swift in Sources */,
 				6FCCA8082AC33A170092D007 /* GradientView.swift in Sources */,
 				6F12ED382AC566FB003D167A /* ForecastCollectionViewCell.swift in Sources */,
 				6F12ED3B2AC56A12003D167A /* Forecast.swift in Sources */,

@@ -16,7 +16,7 @@ class MainViewController: UIViewController {
     private static let id = "&appid=82aa1dd27f2bfb3f068c8bdd58442661"
     
     var fiveForecast: [String] = []
-    
+    var city = "Almaty"
     var weatherArray: [Weather] = []
     
     //MARK: Elements
@@ -374,6 +374,12 @@ extension MainViewController {
             make.height.width.equalTo(240)
             make.centerX.equalTo(view.snp.centerX)
         }
+        
+        searchButton.addTarget(
+            self,
+            action: #selector(openSearchScreen),
+            for: .touchUpInside
+        )
     }
 }
 
@@ -392,9 +398,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
             let midnightForecasts = weather.forecastArray.filter { $0.date.hasSuffix("00:00:00") }
             filteredForecasts.append(contentsOf: midnightForecasts)
         }
-        
-        print(filteredForecasts)
-        
+                
         if indexPath.row < filteredForecasts.count {
             let forecast = filteredForecasts[indexPath.row]
             cell.configure(forecast: forecast)
@@ -411,20 +415,42 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
     }
 }
 
+extension MainViewController: CityNameProtocol {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+    
+    func setCityName(_ cityName: String) {
+        city = cityName
+        loadData()
+    }
+    
+    @objc func openSearchScreen () {
+        let vc = SearchViewController()
+        vc.modalPresentationStyle = .fullScreen
+        vc.delegate = self
+        self.present(vc, animated: true)
+    }
+    
+    func updateUIWithData() {
+        setResults()
+        collectionView.reloadData()
+    }
+}
+
 extension MainViewController {
     func loadData() {
         SVProgressHUD.show()
-        
-        AF.request("http://api.openweathermap.org/data/2.5/forecast?q=Almaty" + MainViewController.id, method: .get).responseJSON { response in
+        AF.request("http://api.openweathermap.org/data/2.5/forecast?q=\(city)" + MainViewController.id, method: .get).responseJSON { response in
             
             SVProgressHUD.dismiss()
             
             if response.response?.statusCode == 200 {
                 let json = JSON(response.data!)
                 let weather = Weather(json: json)
+                self.weatherArray.removeAll()
                 self.weatherArray.append(weather)
-                self.setResults()
-                self.collectionView.reloadData()
+                self.updateUIWithData()
             } else {
                 SVProgressHUD.showError(withStatus: "CONNECTION_ERROR")
             }
@@ -448,7 +474,7 @@ extension MainViewController {
                 date = date.trimmingCharacters(in: .whitespaces)
                 dateLabel.text = setFormattedDate(date: date)
             }
-
+            
         }
         cityLabel.text = weatherArray.first?.cityName
         countryLabel.text = weatherArray.first?.countryName
